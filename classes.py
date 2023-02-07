@@ -341,10 +341,14 @@ class PlotCanvas(FigureCanvas):
             lim_max.append(np.max(self.blackbox.storage[: self.blackbox.index, i]))
             lim_min.append(np.min(self.blackbox.storage[: self.blackbox.index, i]))
         self.ax.cla()
+        if self.blackbox.recording:
+            window_size = self.window_size
+        else:
+            window_size = self.blackbox.index
         for x, i in enumerate(self.index2plot):
             (line,) = self.ax.plot(
                 range(self.window_size),
-                self.blackbox.storage[self.blackbox.index - self.window_size : self.blackbox.index, i],
+                self.blackbox.storage[self.blackbox.index - window_size : self.blackbox.index, i],
                 self.colors[x],
                 linewidth=1,
                 label=self.blackbox.labels[i],
@@ -364,6 +368,7 @@ class PlotCanvas(FigureCanvas):
                 linewidth=0.5,
                 label=self.blackbox.labels[i],
             )
+        self.ax.legend()
         self.draw()
 
     def drawPlot(self):
