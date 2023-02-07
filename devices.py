@@ -3,7 +3,8 @@ import math
 import threading
 from PyQt5.QtCore import pyqtSignal
 
-DEADZONE = 0.08
+DEADZONE = 0.008
+EXPO = 1.5
 
 
 class Controls(object):
@@ -47,31 +48,39 @@ class XboxController(object):
                     if event.code == "ABS_Y":
                         value = -event.state / XboxController.MAX_JOY_VAL  # normalize between -1 and 1
                         if abs(value) > DEADZONE:
-                            self.controls.ly = value - math.copysign(DEADZONE, value)
+                            self.controls.ly = math.copysign(
+                                math.pow(abs((value - math.copysign(DEADZONE, value)) / (1 - DEADZONE)), EXPO), value
+                            )
                         else:
                             self.controls.ly = 0
                     elif event.code == "ABS_X":
                         value = event.state / XboxController.MAX_JOY_VAL  # normalize between -1 and 1
                         if abs(value) > DEADZONE:
-                            self.controls.lx = value - math.copysign(DEADZONE, value)
+                            self.controls.lx = math.copysign(
+                                math.pow(abs((value - math.copysign(DEADZONE, value)) / (1 - DEADZONE)), EXPO), value
+                            )
                         else:
                             self.controls.lx = 0
                     elif event.code == "ABS_RY":
                         value = -event.state / XboxController.MAX_JOY_VAL  # normalize between -1 and 1
                         if abs(value) > DEADZONE:
-                            self.controls.ry = value - math.copysign(DEADZONE, value)
+                            self.controls.ry = math.copysign(
+                                math.pow(abs((value - math.copysign(DEADZONE, value)) / (1 - DEADZONE)), EXPO), value
+                            )
                         else:
                             self.controls.ry = 0
                     elif event.code == "ABS_RX":
                         value = event.state / XboxController.MAX_JOY_VAL  # normalize between -1 and 1
                         if abs(value) > DEADZONE:
-                            self.controls.rx = value - math.copysign(DEADZONE, value)
+                            self.controls.rx = math.copysign(
+                                math.pow(abs((value - math.copysign(DEADZONE, value)) / (1 - DEADZONE)), EXPO), value
+                            )
                         else:
                             self.controls.rx = 0
                     elif event.code == "ABS_RZ":
                         value = event.state / XboxController.MAX_TRIG_VAL  # normalize between -1 and 1
                         if abs(value) > DEADZONE:
-                            self.controls.tr = value - math.copysign(DEADZONE, value)
+                            self.controls.tr = (value - math.copysign(DEADZONE, value)) / (1 - DEADZONE)
                         else:
                             self.controls.tr = 0
 
