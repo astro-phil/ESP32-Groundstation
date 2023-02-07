@@ -73,10 +73,8 @@ class MainWindow(QWidget):
         self.lt_info.addWidget(self.pb_connect)
         self.config = Configuration(self.fe_info)
         self.lt_info.addWidget(self.config.getWidget())
-        self.pb_update = QPushButton("update", self.fe_info)
+        self.pb_update = QPushButton("write config", self.fe_info)
         self.lt_info.addWidget(self.pb_update)
-        self.pb_arm = QPushButton("arm", self.fe_info)
-        self.lt_info.addWidget(self.pb_arm)
         self.pb_connect.clicked.connect(self.connect)
         self.pb_update.clicked.connect(self.configurate)
 
@@ -135,7 +133,6 @@ class MainWindow(QWidget):
 
     def redrawTelemetry(self):
         eng = self.telemetry.engines
-        # self.logger.update(self.telemetry)
         if self.tb_main.currentIndex() == 0:
             self.drone_thrust.update(eng[0], eng[1], eng[2], eng[3])
             att = self.telemetry.attitude
