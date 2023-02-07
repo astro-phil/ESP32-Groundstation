@@ -318,7 +318,7 @@ class PlotCanvas(FigureCanvas):
         self.window_size = 100
         self.ax = self.figure.add_subplot(111)
         self.ax.set_title("PyQt Matplotlib Example")
-        self.colors = ["r-", "g-", "b-", "y-"]
+        self.colors = ["r-", "g-", "b-", "y-", "c-", "m-", "k-"]
         self.draw()
 
     def setBlackBox(self, blackbox: BlackBox):
@@ -349,7 +349,7 @@ class PlotCanvas(FigureCanvas):
             (line,) = self.ax.plot(
                 range(self.window_size),
                 self.blackbox.storage[self.blackbox.index - window_size : self.blackbox.index, i],
-                self.colors[x],
+                self.colors[x % 8],
                 linewidth=1,
                 label=self.blackbox.labels[i],
             )
@@ -364,7 +364,7 @@ class PlotCanvas(FigureCanvas):
             self.ax.plot(
                 self.blackbox.timestamp[: self.blackbox.index],
                 self.blackbox.storage[: self.blackbox.index, i],
-                self.colors[x],
+                self.colors[x % 8],
                 linewidth=0.5,
                 label=self.blackbox.labels[i],
             )
@@ -379,7 +379,7 @@ class PlotCanvas(FigureCanvas):
                 (line,) = self.ax.plot(
                     range(self.window_size),
                     self.blackbox.storage[self.blackbox.index - self.window_size : self.blackbox.index, i],
-                    self.colors[x],
+                    self.colors[x % 8],
                     linewidth=1,
                     label=self.blackbox.labels[i],
                 )
