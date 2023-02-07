@@ -12,6 +12,7 @@ class Telemetry(object):  #
     def __init__(self) -> None:
         self.engines = [0.0, 0.0, 0.0, 0.0]
         self.attitude = [0.0, 0.0, 0.0]
+        self.targetAttitude = [0.0, 0.0, 0.0]
         self.altitude = 0
         self.cycletime = 0
         self.armed = False
@@ -26,9 +27,24 @@ class BlackBox(object):
         self.recording = False
         self.data_length = size
         self.index = 0
-        self.storage = np.zeros((self.data_length, 11))
+        self.labels = [
+            "Roll",
+            "Pitch",
+            "Yaw",
+            "Target Roll",
+            "Target Pitch",
+            "Target Yaw",
+            "Engine 1",
+            "Engine 2",
+            "Engine 3",
+            "Engine 4",
+            "Altitude",
+            "Voltage",
+            "CycleTime",
+            "Armed",
+        ]
+        self.storage = np.zeros((self.data_length, len(self.labels)))
         self.timestamp = np.zeros((self.data_length, 1))
-        self.labels = ["Roll", "Pitch", "Yaw", "Engine 1", "Engine 2", "Engine 3", "Engine 4", "Altitude"]
 
     def start_recording(self):
         self.startTime = time.time()
@@ -46,6 +62,7 @@ class BlackBox(object):
             return
         data = []
         data.extend(telemetry.attitude)
+        data.extend(telemetry.targetAttitude)
         data.extend(telemetry.engines)
         data.append(telemetry.altitude)
         data.append(telemetry.voltage)
@@ -223,6 +240,10 @@ class Tower:
                     # Stuff
                     self.telemetry.altitude = struct.unpack("H", data[17:19])[0]
                     self.telemetry.voltage = int(struct.unpack("H", data[19:21])[0] / 3)
+                    # Attitude
+                    self.telemetry.targetAttitude[0] = struct.unpack("h", data[21:23])[0] / 160.0
+                    self.telemetry.targetAttitude[1] = struct.unpack("h", data[23:25])[0] / 160.0
+                    self.telemetry.targetAttitude[2] = struct.unpack("h", data[25:27])[0] / 160.0
                     self.blackbox.record(self.telemetry)
                     timer.reset()
             elif self.socket_blocked:
