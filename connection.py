@@ -221,29 +221,28 @@ class Tower:
 
     def _runTelemetry(self) -> None:
         mtype = bytearray(struct.pack("B", 10))
-        timer = Timeout(4)
+        timer = Timeout(10)
         while self.connected and timer.tick():
             if select.select([self.socket], [], [], 1.0)[0] and not self.socket_blocked:
                 data = self.socket.recvfrom(1024)[0]
                 if mtype == bytearray(data[:1]):
-                    self.telemetry.cycletime = struct.unpack("B", data[1:2])[0]
-                    self.telemetry.armed = struct.unpack("B", data[2:3])[0] != 0
+                    self.telemetry.armed = struct.unpack("B", data[1:2])[0] != 0
+                    self.telemetry.cycletime = struct.unpack("H", data[2:4])[0]
                     # Attitude
-                    self.telemetry.attitude[0] = struct.unpack("h", data[3:5])[0] / 160.0
-                    self.telemetry.attitude[1] = struct.unpack("h", data[5:7])[0] / 160.0
-                    self.telemetry.attitude[2] = struct.unpack("h", data[7:9])[0] / 160.0
+                    self.telemetry.attitude[0] = struct.unpack("h", data[4:6])[0] / 160.0
+                    self.telemetry.attitude[1] = struct.unpack("h", data[6:8])[0] / 160.0
+                    self.telemetry.attitude[2] = struct.unpack("h", data[8:10])[0] / 160.0
                     # Engines
-                    self.telemetry.engines[0] = (struct.unpack("H", data[9:11])[0] - 3277) / 3277
-                    self.telemetry.engines[1] = (struct.unpack("H", data[11:13])[0] - 3277) / 3277
-                    self.telemetry.engines[2] = (struct.unpack("H", data[13:15])[0] - 3277) / 3277
-                    self.telemetry.engines[3] = (struct.unpack("H", data[15:17])[0] - 3277) / 3277
+                    self.telemetry.engines[0] = (struct.unpack("H", data[10:12])[0] - 3277) / 3277
+                    self.telemetry.engines[1] = (struct.unpack("H", data[12:14])[0] - 3277) / 3277
+                    self.telemetry.engines[2] = (struct.unpack("H", data[14:16])[0] - 3277) / 3277
+                    self.telemetry.engines[3] = (struct.unpack("H", data[16:18])[0] - 3277) / 3277
                     # Stuff
-                    self.telemetry.altitude = struct.unpack("H", data[17:19])[0]
-                    self.telemetry.voltage = int(struct.unpack("H", data[19:21])[0] / 3)
+                    self.telemetry.voltage = int(struct.unpack("H", data[18:20])[0] / 3)
                     # Attitude
-                    self.telemetry.targetAttitude[0] = struct.unpack("h", data[21:23])[0] / 160.0
-                    self.telemetry.targetAttitude[1] = struct.unpack("h", data[23:25])[0] / 160.0
-                    self.telemetry.targetAttitude[2] = struct.unpack("h", data[25:27])[0] / 160.0
+                    self.telemetry.targetAttitude[0] = struct.unpack("h", data[20:22])[0] / 160.0
+                    self.telemetry.targetAttitude[1] = struct.unpack("h", data[22:24])[0] / 160.0
+                    self.telemetry.targetAttitude[2] = struct.unpack("h", data[24:26])[0] / 160.0
                     self.blackbox.record(self.telemetry)
                     timer.reset()
             elif self.socket_blocked:
